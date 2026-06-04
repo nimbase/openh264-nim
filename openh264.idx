@@ -1,0 +1,37 @@
+nimTitle	openh264	openh264.html	module openh264		0
+nim	OpenH264Error	openh264.html#OpenH264Error	object OpenH264Error		20
+nim	EncoderError	openh264.html#EncoderError	object EncoderError		21
+nim	DecoderError	openh264.html#DecoderError	object DecoderError		22
+nim	checkEncoder	openh264.html#checkEncoder.t,cint,string	template checkEncoder(code: cint; msg: string)		24
+nim	checkDecoder	openh264.html#checkDecoder.t,clong,string	template checkDecoder(code: clong; msg: string)		28
+nim	Encoder	openh264.html#Encoder	type Encoder		36
+nim	newEncoder	openh264.html#newEncoder	proc newEncoder(): Encoder		40
+nim	close	openh264.html#close,Encoder	proc close(enc: Encoder)		47
+nim	initialize	openh264.html#initialize,Encoder,int,int,int,float,EUsageType	proc initialize(enc: Encoder; width, height, bitrate: int; frameRate: float = 30.0;\n           usage: EUsageType = CAMERA_VIDEO_REAL_TIME)		55
+nim	initializeExt	openh264.html#initializeExt,Encoder,SEncParamExt	proc initializeExt(enc: Encoder; param: var SEncParamExt)		71
+nim	getDefaultParams	openh264.html#getDefaultParams,Encoder	proc getDefaultParams(enc: Encoder): SEncParamExt		77
+nim	encodeFrame	openh264.html#encodeFrame,Encoder,SSourcePicture	proc encodeFrame(enc: Encoder; pic: var SSourcePicture): SFrameBSInfo		83
+nim	encodeParameterSets	openh264.html#encodeParameterSets,Encoder	proc encodeParameterSets(enc: Encoder): SFrameBSInfo		90
+nim	forceIntraFrame	openh264.html#forceIntraFrame,Encoder,bool	proc forceIntraFrame(enc: Encoder; idr: bool = true)		96
+nim	setOption	openh264.html#setOption,Encoder,ENCODER_OPTION,pointer	proc setOption(enc: Encoder; option: ENCODER_OPTION; value: pointer)		101
+nim	getOption	openh264.html#getOption,Encoder,ENCODER_OPTION,pointer	proc getOption(enc: Encoder; option: ENCODER_OPTION; value: pointer)		107
+nim	setFrameRate	openh264.html#setFrameRate,Encoder,float32	proc setFrameRate(enc: Encoder; fps: float32)		113
+nim	setBitrate	openh264.html#setBitrate,Encoder,int	proc setBitrate(enc: Encoder; bitrate: int)		118
+nim	getStatistics	openh264.html#getStatistics,Encoder	proc getStatistics(enc: Encoder): SEncoderStatistics		123
+nim	Decoder	openh264.html#Decoder	type Decoder		131
+nim	DecodedFrame	openh264.html#DecodedFrame	object DecodedFrame		135
+nim	hasOutput	openh264.html#hasOutput,DecodedFrame	proc hasOutput(frame: DecodedFrame): bool		143
+nim	newDecoder	openh264.html#newDecoder	proc newDecoder(): Decoder		147
+nim	close	openh264.html#close,Decoder	proc close(dec: Decoder)		154
+nim	initialize	openh264.html#initialize,Decoder,ERROR_CON_IDC,VIDEO_BITSTREAM_TYPE	proc initialize(dec: Decoder; ecMode: ERROR_CON_IDC = ERROR_CON_FRAME_COPY;\n           bsType: VIDEO_BITSTREAM_TYPE = VIDEO_BITSTREAM_AVC)		162
+nim	decodeFrame	openh264.html#decodeFrame,Decoder,openArray[uint8]	proc decodeFrame(dec: Decoder; src: openArray[uint8]): DecodedFrame		176
+nim	flushFrame	openh264.html#flushFrame,Decoder	proc flushFrame(dec: Decoder): DecodedFrame		196
+nim	setOption	openh264.html#setOption,Decoder,DECODER_OPTION,pointer	proc setOption(dec: Decoder; option: DECODER_OPTION; value: pointer)		216
+nim	getOption	openh264.html#getOption,Decoder,DECODER_OPTION,pointer	proc getOption(dec: Decoder; option: DECODER_OPTION; value: pointer)		222
+nim	codecVersion	openh264.html#codecVersion	proc codecVersion(): OpenH264Version		231
+nim	codecVersionString	openh264.html#codecVersionString	proc codecVersionString(): string		235
+nim	decoderCapability	openh264.html#decoderCapability	proc decoderCapability(): SDecoderCapability		240
+nimgrp	initialize	openh264.html#initialize-procs-all	proc		55
+nimgrp	close	openh264.html#close-procs-all	proc		47
+nimgrp	setoption	openh264.html#setOption-procs-all	proc		101
+nimgrp	getoption	openh264.html#getOption-procs-all	proc		107
