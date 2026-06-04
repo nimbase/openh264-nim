@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "George Lemon"
-description   = "A new awesome nimble package"
+description   = "Bindings for Cisco's H.264 codec library"
 license       = "MIT"
 srcDir        = "src"
 
