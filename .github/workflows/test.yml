@@ -1,30 +1,28 @@
-# name: test
-# on:
-#   push:
-#     paths-ignore:
-#       - LICENSE
-#       - README.*
-#       - examples
-#       - .github/workflows
-#   pull_request:
-#     paths-ignore:
-#       - LICENSE
-#       - README.*
-#       - examples
-#       - .github/workflows
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         nim-version:
-#           - 'stable'
-#     steps:
-#       - uses: actions/checkout@v3
-#       - uses: jiro4989/setup-nim-action@v1
-#         with:
-#           nim-version: ${{ matrix.nim-version }}
-#           repo-token: ${{ secrets.GITHUB_TOKEN }}
-#       - run: nimble install -Y
-#       - run: nim c -r src/${{ github.event.repository.name }}.nim
-#       - run: nimble test
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    uses: nimbase/setup-nim-action/.github/workflows/test_clue.yml@main
+    with:
+      # Install the native OpenH264 library before building the tests.
+      # The default matrix covers Linux, macOS and Windows.
+      pre-test-command: |
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          sudo apt-get update -y
+          sudo apt-get install -y libopenh264-dev
+        elif [ "$RUNNER_OS" = "macOS" ]; then
+          brew install openh264
+          prefix="$(brew --prefix openh264)"
+          echo "CPATH=${prefix}/include${CPATH:+:${CPATH}}" >> "$GITHUB_ENV"
+          echo "LIBRARY_PATH=${prefix}/lib${LIBRARY_PATH:+:${LIBRARY_PATH}}" >> "$GITHUB_ENV"
+        elif [ "$RUNNER_OS" = "Windows" ]; then
+          vcpkg_root="${VCPKG_INSTALLATION_ROOT:-C:\\vcpkg}"
+          vcpkg_root="${vcpkg_root//\\//}"
+          "$vcpkg_root/vcpkg" install openh264:x64-windows
+          inst="$vcpkg_root/installed/x64-windows"
+          echo "CPATH=${inst}/include${CPATH:+:${CPATH}}" >> "$GITHUB_ENV"
+          echo "LIBRARY_PATH=${inst}/lib${LIBRARY_PATH:+:${LIBRARY_PATH}}" >> "$GITHUB_ENV"
+          echo "INCLUDE=${inst}/include${INCLUDE:+;${INCLUDE}}" >> "$GITHUB_ENV"
+          echo "LIB=${inst}/lib${LIB:+;${LIB}}" >> "$GITHUB_ENV"
+          echo "${inst}/bin" >> "$GITHUB_PATH"
+        fi

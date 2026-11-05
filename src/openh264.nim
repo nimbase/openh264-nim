@@ -213,6 +213,46 @@ proc flushFrame*(dec: Decoder): DecodedFrame =
     info:   info
   )
 
+proc i420FrameSize*(width, height: int): int =
+  ## Byte size of a packed I420 frame with the given dimensions.
+  ## Use it to size reusable decode buffers.
+  (width * height * 3) div 2
+
+proc copyToPackedI420*(frame: DecodedFrame; dst: var seq[uint8]) =
+  ## Copy a decoded picture into a packed I420 buffer, honoring the
+  ## decoder-internal row strides (which may be wider than the visible width).
+  ## The destination must hold at least i420FrameSize(width, height) bytes.
+  ## Because the decoder reuses its internal picture buffers on every call,
+  ## copy the picture out before the next decode call, ideally into a buffer
+  ## checked out from a fixed pool so no per-frame allocation happens.
+  ## Raises DecoderError when the frame has no output or dst is too small.
+  if not frame.hasOutput:
+    raise newException(DecoderError, "copyToPackedI420: frame has no output")
+  let
+    w = frame.width
+    h = frame.height
+    strideY = int(frame.info.UsrData.sSystemBuffer.iStride[0])
+    strideUV = int(frame.info.UsrData.sSystemBuffer.iStride[1])
+  if dst.len < i420FrameSize(w, h):
+    raise newException(DecoderError, "copyToPackedI420: destination buffer too small")
+  var d = 0
+  let
+    srcY = cast[ptr UncheckedArray[uint8]](frame.planes[0])
+    srcU = cast[ptr UncheckedArray[uint8]](frame.planes[1])
+    srcV = cast[ptr UncheckedArray[uint8]](frame.planes[2])
+  for row in 0 ..< h:
+    copyMem(addr dst[d], unsafeAddr srcY[row * strideY], w)
+    d += w
+  let
+    cw = w div 2
+    ch = h div 2
+  for row in 0 ..< ch:
+    copyMem(addr dst[d], unsafeAddr srcU[row * strideUV], cw)
+    d += cw
+  for row in 0 ..< ch:
+    copyMem(addr dst[d], unsafeAddr srcV[row * strideUV], cw)
+    d += cw
+
 proc setOption*(dec: Decoder; option: DECODER_OPTION; value: pointer) =
   ## Set a decoder option at runtime. The specific options and expected value types are
   ## defined in the OpenH264 API.
